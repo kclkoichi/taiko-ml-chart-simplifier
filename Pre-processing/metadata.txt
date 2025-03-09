@@ -1,0 +1,9 @@
+TITLE:êÁñ{ç˜
+SUBTITLE:--çïÇ§Ç≥P feat.èââπÉ~ÉN
+BPM:154
+WAVE:êÁñ{ç˜.ogg
+OFFSET:-1
+SONGVOL:100
+SEVOL:100
+DEMOSTART:56.54
+SCOREMODE:1
