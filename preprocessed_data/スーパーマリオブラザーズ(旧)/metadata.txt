@@ -1,0 +1,9 @@
+TITLE:スーパーマリオブラザーズ(旧)
+SUBTITLE:--
+BPM:100.16
+OFFSET:-3
+WAVE:スーパーマリオブラザーズ(旧).ogg
+SONGVOL:100
+SEVOL:100
+DEMOSTART:3
+SCOREMODE:1
