@@ -1,0 +1,3 @@
+Songs with too many #BPMCHANGE, #SCROLL, #MEASURE commands are too much of outliers
+We want particular measure like 4 beats for building specialised model
+Songs with 2 players have charts which are made for 2 players, irrelevant to us
