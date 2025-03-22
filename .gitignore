@@ -22,3 +22,7 @@ songs/*
 src/old_models
 
 src/analysis/past_analysis
+src/analysis/valid_charts.txt # I ran git update-index --assume-unchanged src/analysis/valid_charts.txt
+
+src/analysis/to_make_model_E
+

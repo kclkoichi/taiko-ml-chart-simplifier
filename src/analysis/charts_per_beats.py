@@ -6,15 +6,15 @@ import os
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 two_up_dir = os.path.dirname(os.path.dirname(cur_dir))
-songs_path = os.path.join(two_up_dir, "songs", "09 Namco Original") # Extra argument to specify folder
+songs_path = os.path.join(two_up_dir, "songs") # Extra argument to specify folder
 
 # The type of beat I want
 beat = 4
 
 # Threshold of count of a command per song, not per difficulty of a song
-bpm_change_count_threshold = 5 # Basically limiting to 1 bpm change per difficulty
-scroll_count_threshold = 5
-measure_count_threshold = 5
+bpm_change_count_threshold = 25 # Basically limiting to 5-6 bpm change per difficulty
+scroll_count_threshold = 25
+measure_count_threshold = 25
 
 output_filenames = []
 
@@ -68,7 +68,7 @@ def process_lines(lines, filename):
             and scroll_count <= scroll_count_threshold 
             and measure_count <= measure_count_threshold):
                 output_filenames.append(filename)
-                
+
 for foldername, subfolders, filenames in os.walk(songs_path):
     for filename in filenames:
         if filename.endswith(".tja"):

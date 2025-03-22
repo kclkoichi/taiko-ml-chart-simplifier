@@ -3,8 +3,12 @@ import numpy as np
 
 class DatasetsMaker:
     """
-    Only processes the following 4 difficulties (ignores any other):
+    Processes the following 4 difficulties (ignores any other):
     Oni, Hard, Normal, Easy
+
+    Ignores files with STYLE:DOUBLE (2 player charts)
+
+    Modify this to (Edit + Oni) -> Hard...?
     """
 
     def __init__(self, preprocessed_data_dir, datasets_dir):
@@ -20,10 +24,10 @@ class DatasetsMaker:
 
     def extract_lines_from_file(self, filepath):
         """
-        Extracts lines from a given chart file.
+        Extracts non-empty lines from a given chart file, ignoring lines with only spaces.
         """
         with open(filepath, 'r', encoding='utf-8') as file:
-            return file.read().strip().split('\n')
+            return [line for line in file.read().split('\n') if line.strip()]
 
     def process_lines(self, lines):
         """
@@ -73,12 +77,13 @@ class DatasetsMaker:
                     continue
 
                 # Skip songs which doens't have same line count for every difficulty
-                # Note: This is due to oni charts having different 2nd player chart,
-                # and some more BPMCHANGE (e.g: FUJIN RUMBLE)
                 # TODO (maybe?): Process these files. Have enough data to skip them though...
                 processed_song_lines = {}
                 for difficulty in difficulty_lines.keys():
                     lines = self.extract_lines_from_file(os.path.join(song_folder_path, f"{difficulty}.txt"))
+                    if "STYLE:DOUBLE" in lines:
+                        print(f"Skipping {song_folder} (2 player chart)")
+                        break
                     processed_song_lines[difficulty] = self.process_lines(lines)
                 difficulty_lengths = {d: len(lines) for d, lines in processed_song_lines.items()}
                 if len(set(difficulty_lengths.values())) > 1:
