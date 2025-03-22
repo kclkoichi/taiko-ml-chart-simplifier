@@ -14,8 +14,8 @@ class TjaFileSlicer:
     def detect_encoding(self, filepath):
         """Detect file encoding using chardet"""
         with open(filepath, 'rb') as file:
-            # Read first 50 bytes, enough for reading title which is indicative of encoding
-            raw_data = file.read(50)
+            # Read first 100 bytes, enough for reading title which is indicative of encoding (also needed subtitle so increased from 50 to 100)
+            raw_data = file.read(100)
             result = chardet.detect(raw_data)
             return result['encoding']
 
@@ -50,6 +50,8 @@ class TjaFileSlicer:
         print(f"Saved: {filepath}")
 
     def process_files(self):
+        count = 0
+
         """Recursively process all .tja files in raw_data_dir and subdirectories"""
         for root, _, files in os.walk(self.raw_data_dir):  # Recursively search files
             for filename in files:
@@ -73,5 +75,7 @@ class TjaFileSlicer:
                     difficulty_dict = self.split_difficulties(file_content)
                     for difficulty_name, content in difficulty_dict.items():
                         self.save_file(song_name, f"{difficulty_name}.txt", content)
+                    count += 1
                 else:
                     print(f"{filename} ignored")
+        print(f"Processed {count} .tja files")

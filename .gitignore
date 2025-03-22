@@ -26,3 +26,4 @@ src/analysis/valid_charts.txt # I ran git update-index --assume-unchanged src/an
 
 src/analysis/to_make_model_E
 
+datasets/E_datasets/songs_used.txt
