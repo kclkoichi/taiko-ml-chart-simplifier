@@ -14,7 +14,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 prediction_input_path = os.path.join("prediction", "in")
 preprocessed_path = os.path.join("prediction", "in", "preprocessed_data")
-models_path = os.path.join("models")
+models_path = os.path.join("models", "E_model_only_4_beats_charts")
 predictions_path = os.path.join("prediction", "out")
 tokenizer_path = os.path.join("models", "tokenizer.json")
 
@@ -26,10 +26,19 @@ tja_file_slicer.process_files()
 
 difficulties = ['Easy', 'Normal', 'Hard', 'Oni']
 
-# Assumes only one song in folder!!
+for f in os.listdir(prediction_input_path):
+    print(f)
 
-# Song name without .tja extension
-song_name = os.path.splitext(os.listdir(preprocessed_path)[0])[0]
+song_name = None
+# Assumes only one song in folder!!
+tja_files = [f for f in os.listdir(prediction_input_path) if f.endswith(".tja")]
+if tja_files:  
+    # Get the first file ending with .tja
+    song_name = os.path.splitext(tja_files[0])[0]  # Remove the .tja extension  
+else:  
+    print("No .tja files found.")
+    print(song_name)
+    exit()
 
 # Check if the target difficulty already exists
 target_difficulty_path = os.path.join(preprocessed_path, song_name, f"{target_difficulty}.txt")
@@ -85,11 +94,7 @@ difficulty_to_model_map = {
     'Oni': 'oni_to_hard_model.h5'
 }
 
-print(notes)
-
 while cur_difficulty is not target_difficulty:
-    print(cur_difficulty)
-
     # Load the saved model
     model_path = os.path.join(models_path, difficulty_to_model_map[cur_difficulty])
     model = tf.keras.models.load_model(model_path)
@@ -124,6 +129,7 @@ while cur_difficulty is not target_difficulty:
     cur_difficulty = difficulties[difficulties.index(cur_difficulty) - 1]
 
 ### Postprocess chart
+# add logic chart? OR class
 
 # Ensure predictions directory exists
 os.makedirs(predictions_path, exist_ok=True)
@@ -142,6 +148,7 @@ with open(output_file_path, 'w', encoding='utf-8') as output_file:
                 output_file.write("\n")  # Handle missing predictions safely
         else:
             output_file.write(line + "\n")
+
 
 print(f"Predicted chart saved to: {output_file_path}")
 

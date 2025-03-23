@@ -107,7 +107,7 @@ class ChartSimplificationModel:
         """Trains all models for chart simplification."""
         self.create_and_train_normal_to_easy()
         self.create_and_train_hard_to_normal()
-        # self.create_and_train_oni_to_hard()
+        self.create_and_train_oni_to_hard()
 
 # Btw for some reason it can't make the models in a row, it crashes when trying to move to next one
 # Only on gf's machine, not mine... :thinking:
