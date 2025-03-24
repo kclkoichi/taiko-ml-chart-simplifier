@@ -24,6 +24,17 @@ Coming soon. But probably command line tool. Can also attach text to explain in 
 
 Coming soon. Need Numpy, Tensorflow, Chardet. I use anaconda because it simplifies everything.
 
+~~Install by yourself using:~~
+~~`conda install conda-forge::tensorflow`~~
+~~`conda install conda-forge::chardet`~~
+
+Load conda environment using taiko-ml.yaml. Code will not work with newest version of Tensorflow available with conda (2.18.0 as of 2025/03/24)
+
+## Versions I use
+python: 3.11.5
+tensorflow: 2.12.0
+chardet: 5.2.0
+
 ## Compatible files
 
 TCS can take .tja and .zip files compatible with OpenTaiko and 太鼓さん次郎 (Taiko-san jiro). The output will be of the same format as the input.

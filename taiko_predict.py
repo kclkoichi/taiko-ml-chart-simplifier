@@ -6,7 +6,6 @@ import re
 from src.make_datasets.tjaFileSlicer import TjaFileSlicer
 
 ### From an input file, predicts an easified version of the chart
-
 target_difficulty = "Easy"
 
 # Change directory to script file location
@@ -94,6 +93,7 @@ difficulty_to_model_map = {
     'Oni': 'oni_to_hard_model.h5'
 }
 
+# Chaining of prediction is working!
 while cur_difficulty is not target_difficulty:
     # Load the saved model
     model_path = os.path.join(models_path, difficulty_to_model_map[cur_difficulty])

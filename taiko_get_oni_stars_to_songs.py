@@ -1,5 +1,4 @@
 import os
-import shutil
 
 # Only look at .tja files specified in valid_charts.txt
 
