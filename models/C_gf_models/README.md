@@ -1,3 +1,6 @@
+WARNING: Because of setup of library versions (especially TF2.18 on gf machine vs 2.12 on my machine), 
+doesn't seem like I can load these models... Even though tried a lot of fixes...
+
 Changed LSTM to LSTMV1 (using slightly different tensorflow keras library)??
 Run on gf's macbook pro
 Took like 50min each model
