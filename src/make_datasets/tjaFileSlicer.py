@@ -36,6 +36,7 @@ class TjaFileSlicer:
         for difficulty in difficulties:
             lines = difficulty.strip().split('\n')
             name = lines[0].strip()
+            lines[0] = "COURSE:" + name # Keep COURSE: in COURSE:Easy etc
             difficulty_dict[name] = '\n'.join(lines)
 
         return difficulty_dict
