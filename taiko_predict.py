@@ -19,7 +19,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 prediction_input_path = os.path.join("prediction", "in")
 preprocessed_path = os.path.join("prediction", "in", "preprocessed_data")
-models_path = os.path.join("models", "D_first_model_trained_with_many_charts")
+models_path = os.path.join("models", "best_models")
 predictions_path = os.path.join("prediction", "out")
 tokenizer_path = os.path.join("models", "tokenizer.json")
 
@@ -94,6 +94,9 @@ difficulty_to_model_map = {
 
 chartProcessor = ChartProcessor()
 
+to_write = []
+to_write.append(cur_difficulty_lines) # To also have original difficulty in the .tja output file
+
 ### Chain predictions till getting target difficulty chart
 while cur_difficulty is not target_difficulty:
     # balloons indexes are only within notes
@@ -126,7 +129,7 @@ while cur_difficulty is not target_difficulty:
     # Update cur_difficulty and cur_difficulty_lines to the next easier difficulty
     cur_difficulty = difficulties[difficulties.index(cur_difficulty) - 1]
     cur_difficulty_lines = chartProcessor.postprocess(level_metadata, lines, original_notes, notes, balloons)
-
+    to_write.append(cur_difficulty_lines)
 
 ### Make output .tja file with predicted chart
 
@@ -152,7 +155,9 @@ with open(output_file_path, 'w', encoding='utf-8') as output_file:
     for line in metadata_lines:
         output_file.write(line + "\n")
     output_file.write("\n")
-    for line in cur_difficulty_lines:
-        output_file.write(line + "\n") # Add comma if necessary
+    for cur_diff_lines in to_write:
+        for line in cur_diff_lines:
+            output_file.write(line + "\n") # Add comma if necessary
+        output_file.write("\n\n\n")
 
 print(f"Predicted chart saved to: {output_file_path}")

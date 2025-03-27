@@ -18,6 +18,10 @@ class TjaFileSlicer:
             raw_data = file.read(100)
             result = chardet.detect(raw_data)
             return result['encoding']
+        
+    # For some reason, some people (luigi.) put level with the metadata.
+    # So I need a way to still be able to preprocess
+    keep_level = -1
 
     def extract_metadata(self, file_content):
         """Extract metadata lines before first 'COURSE' line"""
@@ -25,7 +29,10 @@ class TjaFileSlicer:
         for line in file_content.strip().split('\n'):
             if line.startswith('COURSE'):
                 break
-            metadata_lines.append(line)
+            if line.startswith('LEVEL'):
+                self.keep_level = line.split(":")[1]
+            else:
+                metadata_lines.append(line)
         return '\n'.join(metadata_lines)
 
     def split_difficulties(self, file_content):
@@ -37,6 +44,8 @@ class TjaFileSlicer:
             lines = difficulty.strip().split('\n')
             name = lines[0].strip()
             lines[0] = "COURSE:" + name # Keep COURSE: in COURSE:Easy etc
+            if name == "Oni" and self.keep_level != -1:
+                lines.insert(1, f"LEVEL:{self.keep_level}")
             difficulty_dict[name] = '\n'.join(lines)
 
         return difficulty_dict

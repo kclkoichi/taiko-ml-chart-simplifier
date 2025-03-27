@@ -144,14 +144,19 @@ class ChartProcessor():
                 error_char_i = j
                 break
         
-        # print("couldn't find 8")
+        if not found:
+            print("couldn't find 8")
+            # It means that there is a non-ending 5/6/7 till end of chart
+            chart_lines[len(chart_lines)-1] = chart_lines[len(chart_lines)-1][:-1] + '8'
+            return
 
         # Need to fix no 8 after 5/6/7
         if(line_i == error_line_i):
             fixed_line = []
             # Expand: append 0 after each char
             for char in chart_lines[line_i]:
-                fixed_line.append(char + "0")
+                fixed_line.append(char)
+                fixed_line.append('0')
             # Adjust after expansion
             char_i *= 2
             error_char_i *= 2
@@ -172,7 +177,9 @@ class ChartProcessor():
                 print(f"Rare add 8 CASE_1: \nline: {chart_lines[line_i]}")
                 fixed_line = []
                 for char in chart_lines[line_i]:
-                    fixed_line.append(char + "000") # Expand more than usual
+                    fixed_line.append(char)
+                    for c in "000":
+                        fixed_line.append(c)# Expand more than usual
                 fixed_line[-1] = '8'
                 chart_lines[line_i] = "".join(fixed_line)
                 return
@@ -184,7 +191,8 @@ class ChartProcessor():
         else:
             fixed_line = []
             for char in chart_lines[error_line_i]:
-                fixed_line.append(char + "0")
+                fixed_line.append(char)
+                fixed_line.append('0')
             # Adjust after expansion
             error_char_i *= 2
             # Insert 8
@@ -264,7 +272,8 @@ class ChartProcessor():
                 if char == "8":
                     count_5679 -= 1
                     if count_5679 < 0:
-                        fixed_notes[i][index] = '0' # Fix error '8' on its own
+                        # Fix error '8' on its own
+                        fixed_notes[i] = fixed_notes[i][:index] + "0" + fixed_notes[i][index + 1:]
                     count_5679 += 1
 
         ## Chart lines
