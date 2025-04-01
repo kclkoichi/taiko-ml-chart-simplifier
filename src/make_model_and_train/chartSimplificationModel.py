@@ -18,7 +18,7 @@ class ChartSimplificationModel:
         self.datasets_dir = datasets_dir
         self.models_dir = models_dir
         self.tokenizer = tf.keras.preprocessing.text.Tokenizer(char_level=True)
-        self.max_len = 64  # Assuming max length of sequence is always 64
+        self.max_len = 128  # Assuming max length of sequence is always 128
 
         # Ensure directories exist
         os.makedirs(self.datasets_dir, exist_ok=True)
@@ -82,6 +82,8 @@ class ChartSimplificationModel:
         model = Model(inputs, output)
         model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
+        model.summary()
+
         # Train model
         model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
 
@@ -108,7 +110,3 @@ class ChartSimplificationModel:
         self.create_and_train_normal_to_easy()
         self.create_and_train_hard_to_normal()
         self.create_and_train_oni_to_hard()
-
-# Btw for some reason it can't make the models in a row, it crashes when trying to move to next one
-# Only on gf's machine, not mine... :thinking:
-# TODO: Check setup when writing setup instructions

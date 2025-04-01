@@ -23,7 +23,7 @@ class ChartProcessor():
         offset = 0
         for line in chart_lines:
             if line.startswith("BALLOON"):
-                balloons_list = list(map(int, line.split(":")[1].split(",")))
+                balloons_list = [int(x) for x in line.split(":")[1].split(",") if x.strip().isdigit()]
             if line.startswith("#START"):
                 break
             else:
@@ -34,6 +34,8 @@ class ChartProcessor():
         notes = [] # Only lines with notes to hit (CANNOT be empty, "," are treated as commands, even if they aren't)
         for i in range(offset, len(chart_lines)):
             line = chart_lines[i].strip()
+            if line.startswith("#SCROLL"):
+                continue # Easy, Normal and Hard charts should not have #SCROLL commands, they are mostly for Oni charts only
             if re.match(r'^[0-9]', line):
                 if ',' in line:
                     lines.append("INSERT_WITH_COMMA")

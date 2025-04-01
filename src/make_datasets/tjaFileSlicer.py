@@ -14,8 +14,8 @@ class TjaFileSlicer:
     def detect_encoding(self, filepath):
         """Detect file encoding using chardet"""
         with open(filepath, 'rb') as file:
-            # Read first 100 bytes, enough for reading title which is indicative of encoding (also needed subtitle so increased from 50 to 100)
-            raw_data = file.read(100)
+            # Read first 200 bytes, enough for reading title which is indicative of encoding (also needed subtitle so increased from 50 to 100)
+            raw_data = file.read(200)
             result = chardet.detect(raw_data)
             return result['encoding']
         

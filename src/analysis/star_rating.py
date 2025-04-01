@@ -6,6 +6,11 @@
 # Had to round to integers, used my own experience to make this mapping
 
 oni_to_hard_map = {
+    # Only exists with fanmade games such as OpenTaiko or Taikosan Jirou
+    "13": "8",
+    "12": "8",
+    "11": "8",
+    # Valid difficulties in original game
     "10": "8",
     "9": "7",
     "8": "6",
