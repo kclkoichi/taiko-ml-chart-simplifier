@@ -14,17 +14,14 @@ class TjaFileSlicer:
     def detect_encoding(self, filepath):
         """Detect file encoding using chardet"""
         with open(filepath, 'rb') as file:
-            # Read first 200 bytes, enough for reading title which is indicative of encoding (also needed subtitle so increased from 50 to 100)
+            # Read first 200 bytes, enough for reading title which is indicative of encoding 
+            # (also needed subtitle so increased from 50 to 100, to 200)
             raw_data = file.read(200)
             result = chardet.detect(raw_data)
             return result['encoding']
-        
-    # For some reason, some people (luigi.) put level with the metadata.
-    # So I need a way to still be able to preprocess
-    keep_level = -1
 
     def extract_metadata(self, file_content):
-        """Extract metadata lines before first 'COURSE' line"""
+        """Extract metadata lines before first COURSE line"""
         metadata_lines = []
         for line in file_content.strip().split('\n'):
             if line.startswith('COURSE'):
@@ -34,6 +31,10 @@ class TjaFileSlicer:
             else:
                 metadata_lines.append(line)
         return '\n'.join(metadata_lines)
+    
+    # For some reason, some people (luigi.) put level with the metadata.
+    # So I need a way to still be able to preprocess
+    keep_level = -1
 
     def split_difficulties(self, file_content):
         """Split file content into a file for each difficulty"""
@@ -42,9 +43,12 @@ class TjaFileSlicer:
 
         for difficulty in difficulties:
             lines = difficulty.strip().split('\n')
+            # Keep difficulty name (Easy) in COURSE:Easy etc
             name = lines[0].strip()
-            lines[0] = "COURSE:" + name # Keep COURSE: in COURSE:Easy etc
+            lines[0] = "COURSE:" + name
             if name == "Oni" and self.keep_level != -1:
+                # The processed chart has LEVEL inside metadata for the 1st chart
+                # Insert it after lines[0] (which is COURSE:Oni)
                 lines.insert(1, f"LEVEL:{self.keep_level}")
             difficulty_dict[name] = '\n'.join(lines)
 
@@ -53,7 +57,7 @@ class TjaFileSlicer:
     def save_file(self, foldername, filename, content):
         """Saves content inside song's folder with UTF-8 encoding"""
         song_folder = os.path.join(self.preprocessed_data_dir, foldername)
-        os.makedirs(song_folder, exist_ok=True)  # Ensure the song's folder exists
+        os.makedirs(song_folder, exist_ok=True)  # Ensure song_folder exists
         filepath = os.path.join(song_folder, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -61,15 +65,13 @@ class TjaFileSlicer:
 
     def process_files(self):
         count = 0
-
-        """Recursively process all .tja files in raw_data_dir and subdirectories"""
-        for root, _, files in os.walk(self.raw_data_dir):  # Recursively search files
+        for root, _, files in os.walk(self.raw_data_dir):
             for filename in files:
                 if filename.endswith(".tja"):
                     input_filepath = os.path.join(root, filename)
 
-                    # Create song folder inside preprocessed_data_dir
-                    song_name = os.path.splitext(filename)[0]  # Remove .tja extension
+                    # Remove .tja extension
+                    song_name = os.path.splitext(filename)[0]
 
                     # Detect encoding and read the file
                     encoding = self.detect_encoding(input_filepath)

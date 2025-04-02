@@ -10,7 +10,7 @@ class DatasetsMaker:
     Easy.npy
     Normal.npy
     Hard.npy
-    EditOni.npy
+    Oni.npy or EditOni.npy
 
     Ignores files with STYLE:DOUBLE (2 player charts)
     Ignores files with #BRANCHSTART (branching charts)
@@ -29,18 +29,19 @@ class DatasetsMaker:
 
     def extract_lines_from_file(self, filepath):
         """
-        Extracts non-empty lines from a given chart file, ignoring lines with only spaces.
+        Extract non-empty lines from a given chart file, ignoring lines with only spaces.
         """
         with open(filepath, 'r', encoding='utf-8') as file:
             return [line for line in file.read().split('\n') if line.strip()]
 
     def process_lines(self, lines):
         """
-        Filters out metadata, comments, and commands (starting with #)
-        Only includes lines between #START and #END (so the notes)
+        Filter out metadata, comments, and commands (starting with #)
+        Only includes notes lines between #START and #END
         """
         processed_lines = []
-        inside_chart = False  # Flag to track when we are inside #START and #END
+        # Flag to track when we are inside #START and #END
+        inside_chart = False
 
         for line in lines:
             line = line.strip()
@@ -54,7 +55,7 @@ class DatasetsMaker:
                 continue
 
             # Correctly only goes through note lines
-            # Empty non-note lines are ignored
+            # (Empty non-note lines are ignored)
             if inside_chart:
                 if not line or line.startswith('#'):
                     continue
@@ -66,14 +67,14 @@ class DatasetsMaker:
 
         return processed_lines
 
-    def process_songs(self, hardest_difficulty, selected_songs_file = None):
+    def process_songs(self, hardest_difficulty = "Oni", selected_songs_file_path = None):
         """
-        Processes all songs and saves the chart lines into datasets.
+        Note: Doesn't process 2P charts and branching charts.
         """
         difficulty_lines = {'Easy': [], 'Normal': [], 'Hard': [], hardest_difficulty: []}
 
-        if selected_songs_file is not None and os.path.exists(selected_songs_file):
-            with open(selected_songs_file, "r", encoding="utf-8") as f:
+        if selected_songs_file_path is not None and os.path.exists(selected_songs_file_path):
+            with open(selected_songs_file_path, "r", encoding="utf-8") as f:
                 selected_songs = set(
                     line.strip().removesuffix(".tja")
                     for line in f
@@ -81,7 +82,7 @@ class DatasetsMaker:
                 )
 
         for song_folder in os.listdir(self.preprocessed_data_dir):
-            if selected_songs_file is not None and song_folder not in selected_songs:
+            if selected_songs_file_path is not None and song_folder not in selected_songs:
                 continue
 
             song_folder_path = os.path.join(self.preprocessed_data_dir, song_folder)
@@ -93,10 +94,6 @@ class DatasetsMaker:
                     print(f"Skipping {song_folder} (missing difficulties: {', '.join(missing_difficulties)})")
                     continue
 
-                # Skip songs which doens't have same line count for every difficulty
-                # Due to 2P songs, branching songs
-                # Acceptable if more #SCROLL for Oni for example, FUJIN Rumble
-                # TODO (maybe?): Process these files. Have enough data to skip them though...
                 processed_song_lines = {}
 
                 skip_chart = False
@@ -110,6 +107,8 @@ class DatasetsMaker:
                         print(f"Skipping {song_folder} (branching chart)")
                         skip_chart = True
                         break
+
+                    # Only keep notes lines
                     processed_song_lines[difficulty] = self.process_lines(lines)
 
                 if skip_chart:
@@ -117,9 +116,11 @@ class DatasetsMaker:
 
                 difficulty_lengths = {d: len(lines) for d, lines in processed_song_lines.items()}
 
+                # TODO (maybe?): Process these files. Have enough data to skip them though...
                 if len(set(difficulty_lengths.values())) > 1:
                     # Might happen when edit/oni had a lot of #SCROLL for faster effect...
-                    # Won't do effort to collapse many lines into 1 in easier difficulties
+                    # Example: FUJIN Rumble
+                    # Won't do effort to collapse many lines into 1
                     print(f"Skipping {song_folder} (line count mismatch): {difficulty_lengths}")
                     continue
                 
@@ -129,8 +130,32 @@ class DatasetsMaker:
                 print(f"Added {song_folder} ({hardest_difficulty})")
 
         return difficulty_lines
+    
+    def make_datasets(self):
+        """
+        Process all songs and save the chart lines into datasets.
+        Note: Edit difficulty excluded
+        """
+        difficulty_lines = self.process_songs()
 
-    def process_songs_oni_and_edit(self, selected_edit_songs_file = None, selected_oni_songs_file = None):
+        # Extra validation to make sure every difficulty dataset has same line count
+        expected_length = len(difficulty_lines["Oni"])
+        for difficulty, lines in difficulty_lines.items():
+            if len(lines) != expected_length:
+                print(f"Warning: {difficulty} has length mismatch (Expected: {expected_length}, Found: {len(lines)})")
+            else:
+                print(f"{difficulty} has {len(lines)} lines (OK).")
+
+        # Save each dataset
+        for difficulty, lines in difficulty_lines.items():
+            np.save(os.path.join(self.datasets_dir, f"{difficulty}.npy"), np.array(lines))
+            print(f"Saved {difficulty}.npy with {len(lines)} lines.")
+
+    def make_datasets_with_oni_and_edit(self, selected_edit_songs_file = None, selected_oni_songs_file = None):
+        """
+        Process all songs and save the chart lines into datasets.
+        Note: Edit difficulty included
+        """
         difficulty_lines = {
             "Easy": [],
             "Normal": [],
