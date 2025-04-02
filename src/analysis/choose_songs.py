@@ -1,30 +1,36 @@
 import os
 
 # Script to help craft your own dataset
-# Only print song with not too many bpm, scrolls, measures change
-# Also avoid songs with particular beat
+# Writes .tja file names to valid_charts.txt if .tja file meets conditions specified here
+
+# Conditions: 
+# - specific beat (time signature)
+# - not too many bpm, scrolls, measures change
+# - not 2-player song
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 two_up_dir = os.path.dirname(os.path.dirname(cur_dir))
-songs_path = os.path.join(two_up_dir, "songs") # Extra argument to specify folder
+songs_path = os.path.join(two_up_dir, "songs", "09 Namco Original") # Extra argument to specify folder
 
 # The type of beat I want
 beat = 4
 
-# Threshold of count of a command per song, not per difficulty of a song
+# Threshold of count of a command per (entire) .tja file, not per difficulty
+# #BPMCHANGE
 bpm_change_count_threshold = 25 # Basically limiting to 5-6 bpm change per difficulty
+# #SCROLL
 scroll_count_threshold = 25
+# #MEASURE
 measure_count_threshold = 25
 
 output_filenames = []
 
 def process_lines(lines, filename):
-    bpm_change_count = 0 # #BPMCHANGE
-    scroll_count = 0 # #SCROLL
-    measure_count = 0 # #MEASURE
+    bpm_change_count = 0
+    scroll_count = 0
+    measure_count = 0
     valid_measure = True
-    # Small addition: also remove songs with 2 player charts, 
-    # they're often too particular and are meant to be played by 2 players in harmony
+    branching = False
     two_player = False
 
     # Flag to track when we are inside #START and #END
@@ -45,6 +51,9 @@ def process_lines(lines, filename):
             if line.strip().startswith('STYLE:Double'):
                 two_player = True
                 break
+            if line.strip().startswith('#BRANCH'):
+                branching = True
+                break
             elif line.startswith('#BPMCHANGE'):
                 bpm_change_count += 1
             elif line.startswith('#SCROLL'):
@@ -63,7 +72,7 @@ def process_lines(lines, filename):
                         valid_measure = False
                         break
         
-    if valid_measure and not two_player:
+    if valid_measure and not two_player and not branching:
         if (bpm_change_count <= bpm_change_count_threshold 
             and scroll_count <= scroll_count_threshold 
             and measure_count <= measure_count_threshold):
@@ -80,7 +89,7 @@ for foldername, subfolders, filenames in os.walk(songs_path):
 with open(os.path.join(cur_dir, "valid_charts.txt"), "w", encoding="utf-8") as f:
     for filename in output_filenames:
         print(filename)
-        f.write(filename + "\n")  # Write each filename on a new line
+        f.write(filename + "\n")
 
 print("Total charts:", len(output_filenames))
 print("Filenames saved to valid_charts.txt")
