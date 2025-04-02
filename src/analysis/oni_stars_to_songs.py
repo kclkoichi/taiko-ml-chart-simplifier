@@ -2,7 +2,7 @@ import os
 
 # Only look at .tja files specified in valid_charts.txt
 
-main_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+main_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 valid_charts_file = os.path.join(main_dir, "src", "analysis", "valid_charts.txt")
 songs_path = os.path.join(main_dir, "songs")
 raw_data_path = os.path.join(main_dir, "raw_data")
