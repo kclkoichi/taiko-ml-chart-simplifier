@@ -3,7 +3,6 @@ import tensorflow as tf
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.layers import Input, LSTM, Dense, Embedding
 import os
-import json
 import sys
 
 # To print full numpy arrays
@@ -24,13 +23,11 @@ class ChartSimplificationModel:
         os.makedirs(self.datasets_dir, exist_ok=True)
         os.makedirs(self.models_dir, exist_ok=True)
 
-        # Load datasets
         self.easy_lines = self.load_dataset('Easy.npy')
         self.normal_lines = self.load_dataset('Normal.npy')
         self.hard_lines = self.load_dataset('Hard.npy')
         self.oni_lines = self.load_dataset('EditOni.npy')
 
-        # Prepare data for tokenization
         self.prepare_tokenizer()
 
         # Save the tokenizer as a JSON file
@@ -49,7 +46,7 @@ class ChartSimplificationModel:
         
         # Fit tokenizer
         self.tokenizer.fit_on_texts(all_lines)
-        self.vocab_size = len(self.tokenizer.word_index) + 1 # Include padding index
+        self.vocab_size = len(self.tokenizer.word_index) + 1 # Include padding
         
         # Convert datasets into sequences
         self.easy_sequences = self.convert_to_sequences(self.easy_lines)
@@ -70,7 +67,7 @@ class ChartSimplificationModel:
 
     def create_and_train_model(self, X_train, y_train, model_filename, epochs=epochs, batch_size=batch_size):
         """Create, train, and save an LSTM-based model."""
-        # Apparently helps avoid crashes due to memory issues :thinking:
+        # (Apparently) Helps avoid crashes due to memory issues
         tf.keras.backend.clear_session()
 
         # Define model architecture
@@ -87,12 +84,10 @@ class ChartSimplificationModel:
         # Train model
         model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
 
-        # Save model
         model_path = os.path.join(self.models_dir, model_filename)
         model.save(model_path)
         print(f"Saved {model_filename} in {self.models_dir}")
 
-    # TODO: Write better check than just empty size maybe
     def create_and_train_oni_to_hard(self):
         if self.oni_sequences.size and self.hard_sequences.size:
             self.create_and_train_model(self.oni_sequences, self.hard_sequences, 'oni_to_hard_model.h5')

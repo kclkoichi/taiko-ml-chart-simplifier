@@ -10,4 +10,5 @@ models_path = os.path.join("models")
 tokenizer_path = os.path.join(models_path, "tokenizer.json")
 
 chart_model = ChartSimplificationModel(datasets_path, models_path, tokenizer_path)
+# Oni -> Hard, Hard -> Normal, Normal -> Easy
 chart_model.train_all_models()
