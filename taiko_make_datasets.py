@@ -4,7 +4,7 @@ from src.make_datasets.datasetsMaker import DatasetsMaker
 
 # Prepares datasets to train Taiko ML Chart Simplifier models
 # .tja files in raw_data can be nested inside directories
-# TODO: Extract .tja files inside .zip files
+# For extension: Extract .tja files inside .zip files
 
 # Change directory to script file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
