@@ -19,10 +19,9 @@ with open(valid_charts_file, "r", encoding="utf-8") as f:
             continue
         valid_filenames.add(line.strip())
 
-# Walk through songs folder recursively
 for root, _, files in os.walk(songs_path):
     for filename in files:
-        if filename.endswith(".tja"):  # Ensure we're only processing .tja files
+        if filename.endswith(".tja"):
             src_path = os.path.join(root, filename)
 
             if filename in valid_filenames:
