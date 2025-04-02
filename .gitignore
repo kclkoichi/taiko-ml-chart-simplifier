@@ -4,7 +4,7 @@ __pycache__/
 
 prediction/in/*
 !prediction/in/preprocessed_data
-prediction/in/preprocessed_data/*
+prediction/in/preprocessed_data/**
 !prediction/in/preprocessed_data/.gitkeep
 prediction/out/*
 !prediction/out/.gitkeep
