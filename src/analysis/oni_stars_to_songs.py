@@ -1,4 +1,5 @@
 import os
+import sys
 
 # Only look at .tja files specified in valid_charts.txt
 
@@ -7,7 +8,9 @@ valid_charts_file = os.path.join(main_dir, "src", "analysis", "valid_charts.txt"
 songs_path = os.path.join(main_dir, "songs")
 raw_data_path = os.path.join(main_dir, "raw_data")
 
-os.path.exists(valid_charts_file)
+if not os.path.exists(valid_charts_file):
+    print(f"File at f{valid_charts_file} does not exist. Exiting.")
+    sys.exit(0)
 os.makedirs(songs_path, exist_ok=True)
 os.makedirs(raw_data_path, exist_ok=True)
 
