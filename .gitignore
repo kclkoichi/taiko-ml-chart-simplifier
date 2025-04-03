@@ -22,4 +22,4 @@ src/analysis/to_make_model_E
 
 src/predict/example.txt
 
-datasets/E_datasets/songs_used.txt
+datasets/old_datasets/E_datasets/songs_used.txt
