@@ -32,7 +32,10 @@ class TjaFileSlicer:
         return '\n'.join(metadata_lines)
     
     # For some reason, some people (luigi.) put level with the metadata.
-    # So I need a way to still be able to preprocess
+    # So I need a way to still be able to preprocess...
+    # Note: This only deals with the case of Oni in metadata, while Edit also exists later
+    # Like designant. by Luigi. https://www.youtube.com/watch?v=3pCEbT5ryy0
+    # TODO: Also place this fix in fix_tja_file.py
     keep_level = -1
 
     def split_difficulties(self, file_content):

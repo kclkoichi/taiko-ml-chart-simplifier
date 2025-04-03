@@ -1,61 +1,75 @@
+import argparse
 import numpy as np
 import tensorflow as tf
 import os
 import sys
+import shutil
 from src.make_datasets.tjaFileSlicer import TjaFileSlicer
 from src.predict.chartProcessor import ChartProcessor
+from src.predict.fix_tja_file import fix_tja_file
 
-# Logic to predict an easier version of a chart from a harder version
+# Helper method for exiting
+def exit_with_preprocessed_removed():
+    try:
+        shutil.rmtree(preprocessed_path)
+    except Exception as e:
+        print(f"Error removing folder: {e}")
+    sys.exit(0)
 
-# Notes: 
-# Can't predict Edit to Oni because they are too similar, and one isn't necessarily harder than the other.
-# Will predict from Oni to Hard, from Hard to Normal, and from Normal to Easy.
-# Because Edit without Oni is not possible, it is never used.
+### taiko_predict.py predicts an easier chart from a harder chart
+### It can predict Oni -> Hard, Hard -> Normal, Normal -> Easy
+### Chain predictions to get Oni -> Easy
+### Warning: DO NOT HAVE A DIRECTORY CALLED "preprocessed_data" IN THE OUTPUT DIRECTORY. IT WILL BE REMOVED.
 
 target_difficulty = "Easy"
 
 # Change directory to script file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
-prediction_input_path = os.path.join("prediction", "in")
-preprocessed_path = os.path.join("prediction", "in", "preprocessed_data")
 models_path = os.path.join("models", "best_models")
-predictions_path = os.path.join("prediction", "out")
 tokenizer_path = os.path.join("models", "tokenizer.json")
 
-# Preprocess input files
-tja_file_slicer = TjaFileSlicer(prediction_input_path, preprocessed_path)
-tja_file_slicer.process_files()
+# To parse command-line arguments
+parser = argparse.ArgumentParser(description="Predict easier versions of Taiko charts from harder versions")
+parser.add_argument('--input', '-i', required=True, help="Path to .tja file for simplification")
+parser.add_argument('--output', '-o', default='prediction/out', help="Output directory to save the simplified .tja file")
+args = parser.parse_args()
 
-print("")
+# Resolve the input path to an absolute path, preserving it if already absolute
+input_file_path = os.path.abspath(args.input)
+output_folder_path = os.path.abspath(args.output)
+os.makedirs(output_folder_path, exist_ok=True)
 
+filename = os.path.basename(input_file_path)
+if filename.endswith(".tja") and os.path.exists(input_file_path):
+    song_name = os.path.splitext(filename)[0]
+else:
+    print("Input must be a path to an existing .tja file. Exiting.")
+    sys.exit(0)
 
-### Finding closest difficulty chart and getting its content from here
+preprocessed_path = os.path.join(output_folder_path, "preprocessed_data")
+os.makedirs(preprocessed_path, exist_ok=True)
 
+# Edge case: Fix files with no 'COURSE:' and only 1 chart
+have_course = False
+with open(input_file_path, 'r', encoding='utf-8') as file:
+    for line in file:
+        if line.strip().startswith('COURSE:'):
+            have_course = True
+if not have_course:
+    fix_tja_file(input_file_path)
+
+# Preprocess input file
+tja_file_slicer = TjaFileSlicer(preprocessed_path)
+tja_file_slicer.process_unique_file(input_file_path)
+
+### Finding closest difficulty chart and getting its content
 difficulties = ['Easy', 'Normal', 'Hard', 'Oni']
-song_name = None
-
-# Assumes only one song in folder!!
-tja_files = [f for f in os.listdir(prediction_input_path) if f.endswith(".tja")]
-if tja_files:  
-    # Get the first file ending with .tja
-    song_name = os.path.splitext(tja_files[0])[0]  # Remove the .tja extension  
-    print(f"Using {song_name} for prediction")
-else:  
-    print(f"No .tja files found in {prediction_input_path}")
-    sys.exit(0)
-
-if target_difficulty not in difficulties[:-1]:
-    print(f"Target difficulty must be either Easy, Normal, or Hard")
-    sys.exit(0)
 
 # Check if the target difficulty already exists
 target_difficulty_path = os.path.join(preprocessed_path, song_name, f"{target_difficulty}.txt")
 if os.path.exists(target_difficulty_path):
     print(f"Target difficulty '{target_difficulty}' already exists for {song_name}. Exiting.")
-    sys.exit(0)
-
-cur_difficulty = None
+    exit_with_preprocessed_removed()
 
 # If target difficulty doesn't exist, find the closest harder difficulty
 target_index = difficulties.index(target_difficulty)
@@ -67,7 +81,7 @@ for difficulty in difficulties[target_index + 1:]:
         break
 else:
     print(f"No harder difficulties than {target_difficulty} found for {song_name}. Exiting.")
-    sys.exit(0)
+    exit_with_preprocessed_removed()
 
 # Load every line of the text file of input_difficulty, WITHOUT any comment
 cur_difficulty_path = os.path.join(preprocessed_path, song_name, f"{cur_difficulty}.txt")
@@ -84,7 +98,7 @@ try:
     print(f"Loaded {len(cur_difficulty_lines)} lines from {cur_difficulty_path}")
 except IOError as e:
     print(f"Failed to read {cur_difficulty_path}: {e}")
-    sys.exit(1)
+    exit_with_preprocessed_removed()
 
 difficulty_to_model_map = {
     'Normal': 'normal_to_easy_model.h5',
@@ -118,10 +132,10 @@ while cur_difficulty is not target_difficulty:
     new_sequence = tf.keras.utils.pad_sequences(new_sequence, maxlen=max_len, padding='post')
 
     predicted = model.predict(np.array(new_sequence))
-    # Get the predicted indices (class with the highest probability)
-    predicted_indices = np.argmax(predicted, axis=-1)
+    # Get the predicted tokens (class with the highest probability)
+    predicted_tokens = np.argmax(predicted, axis=-1)
     # Update to new easier notes (by converting back token to char)
-    notes = tokenizer.sequences_to_texts(predicted_indices)
+    notes = tokenizer.sequences_to_texts(predicted_tokens)
     # Remove spaces from notes 
     # (for some reason, tokenizer puts space characters in between predicted texts)
     notes = [note.replace(' ', '') for note in notes]
@@ -133,12 +147,9 @@ while cur_difficulty is not target_difficulty:
 
 ### Make output .tja file with predicted chart
 
-# Ensure predictions directory exists
-os.makedirs(predictions_path, exist_ok=True)
-
 metadata_path = os.path.join(preprocessed_path, song_name, "metadata.txt")
 metadata_lines = []
-# Remove comments from original file because they are likely irrelevant
+# Remove comments from original file because they are likely irrelevant now
 with open(metadata_path, "r", encoding="utf-8") as file:
     for line in file:
         line = line.strip()
@@ -149,7 +160,7 @@ with open(metadata_path, "r", encoding="utf-8") as file:
             # Ignore empty lines
             metadata_lines.append(line)
 
-output_file_path = os.path.join(predictions_path, f"{song_name}.tja")
+output_file_path = os.path.join(output_folder_path, f"{song_name}.tja")
 # Write new .tja file
 with open(output_file_path, 'w', encoding='utf-8') as output_file:
     for line in metadata_lines:
@@ -161,3 +172,4 @@ with open(output_file_path, 'w', encoding='utf-8') as output_file:
         output_file.write("\n\n\n")
 
 print(f"Predicted chart saved to: {output_file_path}")
+exit_with_preprocessed_removed()
