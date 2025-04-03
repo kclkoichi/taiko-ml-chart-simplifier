@@ -18,8 +18,8 @@ if os.path.exists(raw_data_path) and not os.listdir(raw_data_path):
 preprocessed_data_path = os.path.join("preprocessed_data")
 
 # Preprocess .tja files
-slicer = TjaFileSlicer(raw_data_path, preprocessed_data_path)
-slicer.process_files()
+slicer = TjaFileSlicer(preprocessed_data_path)
+slicer.process_files(raw_data_path)
 
 print("\nPreprocessing done.\n")
 

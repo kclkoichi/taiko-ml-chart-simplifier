@@ -1,14 +1,13 @@
 import re
 import os
+import sys
 import chardet
 
 class TjaFileSlicer:
-    def __init__(self, raw_data_dir, preprocessed_data_dir):
-        self.raw_data_dir = raw_data_dir
+    def __init__(self, preprocessed_data_dir):
         self.preprocessed_data_dir = preprocessed_data_dir
 
         # Ensure directory exist
-        os.makedirs(self.raw_data_dir, exist_ok=True)
         os.makedirs(self.preprocessed_data_dir, exist_ok=True)
 
     def detect_encoding(self, filepath):
@@ -61,33 +60,34 @@ class TjaFileSlicer:
         filepath = os.path.join(song_folder, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)
-        print(f"Saved: {filepath}")
 
-    def process_files(self):
-        count = 0
-        for root, _, files in os.walk(self.raw_data_dir):
+    def process_files(self, raw_data_dir):
+        # Ensure directory exist
+        os.makedirs(raw_data_dir, exist_ok=True)
+
+        for root, _, files in os.walk(raw_data_dir):
             for filename in files:
                 if filename.endswith(".tja"):
-                    input_filepath = os.path.join(root, filename)
+                    input_file_path = os.path.join(root, filename)
+                    self.process_unique_file(input_file_path)
 
-                    # Remove .tja extension
-                    song_name = os.path.splitext(filename)[0]
+    def process_unique_file(self, input_file_path):
+        filename = os.path.basename(input_file_path)
+        if filename.endswith(".tja"):
+            song_name = os.path.splitext(filename)[0] # Remove .tja extension
 
-                    # Detect encoding and read the file
-                    encoding = self.detect_encoding(input_filepath)
-                    print(f"Detected encoding for {filename}: {encoding}")
+            # Detect encoding and read the file
+            encoding = self.detect_encoding(input_file_path)
+            with open(input_file_path, 'r', encoding=encoding) as file:
+                file_content = file.read()
 
-                    with open(input_filepath, 'r', encoding=encoding) as file:
-                        file_content = file.read()
+            # Extract and save metadata
+            self.save_file(song_name, "metadata.txt", self.extract_metadata(file_content))
 
-                    # Extract and save metadata
-                    self.save_file(song_name, "metadata.txt", self.extract_metadata(file_content))
-
-                    # Extract and save difficulties
-                    difficulty_dict = self.split_difficulties(file_content)
-                    for difficulty_name, content in difficulty_dict.items():
-                        self.save_file(song_name, f"{difficulty_name}.txt", content)
-                    count += 1
-                else:
-                    print(f"{filename} ignored")
-        print(f"Processed {count} .tja files")
+            # Extract and save difficulties
+            difficulty_dict = self.split_difficulties(file_content)
+            for difficulty_name, content in difficulty_dict.items():
+                self.save_file(song_name, f"{difficulty_name}.txt", content)
+        else:
+            print(f"Not a .tja file: {filename}")
+            sys.exit(0)
