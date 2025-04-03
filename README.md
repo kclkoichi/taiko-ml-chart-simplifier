@@ -23,14 +23,16 @@ With arguments:
 - -output (or -o) path_to_output_folder
   - Optional: Default is prediction/out
 
-Example Usage (with sample song): `python3 taiko_predict.py -i "prediction/in/Grievous Lady.tja"`  
+⚠️ It is your responsibility to ensure that the .tja file is not suspicious!
+
+Example Usage (with sample song): `python3 taiko_predict.py -i "prediction/in/Kyokuken.tja"`  
 Paths may be relative from the root folder of TCS!
 
 ## 🎮 How to play
 
 Download Taiko-san Daijiro 3. [iOS App Store link](https://apps.apple.com/us/app/taiko-san-daijiro-3/id1183008625), [Android Google Play link](https://play.google.com/store/apps/details?id=com.daijiro.taiko3).
 
-Once your new .tja file is generated, compress it to a .zip file together with the song's .ogg file. Then, share the .zip file to Taiko-san Daijiro 3. The game will automatically process the song. By default, your song will be in the Unnamed folder! Enjoy!
+Once your new .tja file is generated, compress it to a .zip file together with the song's .ogg file. Then, share the .zip file to Taiko-san Daijiro 3. The game will automatically process the song. By default, your song will be in the "Uncategorized" folder! Enjoy!
 
 ## 📦 Installation
 
