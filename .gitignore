@@ -2,13 +2,7 @@
 __pycache__/
 .vscode/
 
-prediction/in/*
-!prediction/in/preprocessed_data
-prediction/in/preprocessed_data/**
-!prediction/in/preprocessed_data/.gitkeep
-prediction/out/*
-!prediction/out/.gitkeep
-prediction/past_predictions
+prediction/past_predictions/
 
 preprocessed_data/*
 !preprocessed_data/.gitkeep
