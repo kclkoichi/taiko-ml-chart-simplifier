@@ -9,3 +9,7 @@ Trained with E_dataset. About 8500 lines of only 4 beats songs.
 Comparision with model D predictions on a paper irl that I wrote on.
 Tbh both have their advantages and it's crazy that model E 
 is also useful considering the small amount of time it used to be trained.
+
+Additional models:
+- a oni_to_hard model with 600 epochs
+- a oni_to_hard model with 600 epochs and batch_size=128

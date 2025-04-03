@@ -26,7 +26,7 @@ class ChartSimplificationModel:
         self.easy_lines = self.load_dataset('Easy.npy')
         self.normal_lines = self.load_dataset('Normal.npy')
         self.hard_lines = self.load_dataset('Hard.npy')
-        self.oni_lines = self.load_dataset('EditOni.npy')
+        self.oni_lines = self.load_dataset('Oni.npy')
 
         self.prepare_tokenizer()
 

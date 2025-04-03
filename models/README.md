@@ -1,6 +1,14 @@
 Storing all models as .h5 files
-First letter is to be able to maintain chronological order, using ascii values
-(excludes super early ones trained on a few lines written by myself) 
+
+Models used for prediction (those in this dir):
+- oni_to_hard_model.h5 : E_model_only_4_beats_charts/oni_to_hard_model600epoch128batchsize.h5
+- hard_to_normal_model.h5 : D_first_model_trained_with_many_charts/hard_to_normal_model.h5
+- normal_to_easy_model.h5 : D_first_model_trained_with_many_charts/normal_to_easy_model.h5
+
+In old_models, first letter of directory is to maintain chronological order, using ascii values
+(excludes some super early ones trained on a few lines written by myself) 
+
+### Notes for myself:
 
 Edit 2025/03/23: New discovery.
 Not sure models made with Tensorflow 2.18 can work with tensorflow 2.12.
