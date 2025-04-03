@@ -25,7 +25,7 @@ target_difficulty = "Easy"
 
 # Change directory to script file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-models_path = os.path.join("models", "best_models")
+models_path = os.path.join("models")
 tokenizer_path = os.path.join("models", "tokenizer.json")
 
 # To parse command-line arguments

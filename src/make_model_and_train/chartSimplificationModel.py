@@ -67,7 +67,7 @@ class ChartSimplificationModel:
 
     def create_and_train_model(self, X_train, y_train, model_filename, epochs=epochs, batch_size=batch_size):
         """Create, train, and save an LSTM-based model."""
-        # (Apparently) Helps avoid crashes due to memory issues
+        # Helps avoid crashes due to memory issues
         tf.keras.backend.clear_session()
 
         # Define model architecture

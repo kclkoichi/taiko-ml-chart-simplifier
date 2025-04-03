@@ -59,7 +59,7 @@ class TjaFileSlicer:
     def save_file(self, foldername, filename, content):
         """Saves content inside song's folder with UTF-8 encoding"""
         song_folder = os.path.join(self.preprocessed_data_dir, foldername)
-        os.makedirs(song_folder, exist_ok=True)  # Ensure song_folder exists
+        os.makedirs(song_folder, exist_ok=True)
         filepath = os.path.join(song_folder, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)

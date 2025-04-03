@@ -10,7 +10,7 @@ class DatasetsMaker:
     Easy.npy
     Normal.npy
     Hard.npy
-    Oni.npy or EditOni.npy
+    Oni.npy (or EditOni.npy)
 
     Ignores files with STYLE:DOUBLE (2 player charts)
     Ignores files with #BRANCHSTART (branching charts)

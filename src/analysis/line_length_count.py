@@ -40,7 +40,7 @@ def process_lines(lines, filename):
                 line_count_map[line_length] = 0
             line_count_map[line_length] += 1
             # To get a song with some peculiarity
-            # if line_length == 192:
+            # if line_length == 128:
             #     print(line)
             #     print(filename)
             #     exit()
@@ -58,5 +58,3 @@ print(f"Total .tja files found: {file_count}")
 print(f"Total lines with notes found: {total_line_count}")
 sorted_line_count_map = sorted(line_count_map.items(), key=lambda item: item[1], reverse=True)
 print(sorted_line_count_map)
-
-# Maybe matplotlib to come up with nice chart? Not sure useful though
