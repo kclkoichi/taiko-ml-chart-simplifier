@@ -21,8 +21,6 @@ def exit_with_preprocessed_removed():
 ### Chain predictions to get Oni -> Easy
 ### Warning: DO NOT HAVE A DIRECTORY CALLED "preprocessed_data" IN THE OUTPUT DIRECTORY. IT WILL BE REMOVED.
 
-target_difficulty = "Easy"
-
 # Change directory to script file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 models_path = os.path.join("models")
@@ -30,6 +28,7 @@ tokenizer_path = os.path.join("models", "tokenizer.json")
 
 # To parse command-line arguments
 parser = argparse.ArgumentParser(description="Predict easier versions of Taiko charts from harder versions")
+parser.add_argument('--target', '-t', default='Easy', help="Target difficulty to predict. Options: Easy, Normal, Hard")
 parser.add_argument('--input', '-i', required=True, help="Path to .tja file for simplification")
 parser.add_argument('--output', '-o', default='prediction/out', help="Output directory to save the simplified .tja file")
 args = parser.parse_args()
@@ -64,6 +63,11 @@ tja_file_slicer.process_unique_file(input_file_path)
 
 ### Finding closest difficulty chart and getting its content
 difficulties = ['Easy', 'Normal', 'Hard', 'Oni']
+
+target_difficulty = args.target
+if target_difficulty not in difficulties:
+    print(f"Invalid target difficulty: {target_difficulty}. Options are: \"Easy\", \"Normal\" and \"Hard\". Exiting.")
+    exit_with_preprocessed_removed()
 
 # Check if the target difficulty already exists
 target_difficulty_path = os.path.join(preprocessed_path, song_name, f"{target_difficulty}.txt")
@@ -112,7 +116,7 @@ to_write = []
 to_write.append(cur_difficulty_lines) # To also have original difficulty in the .tja output file
 
 ### Chain predictions till getting target difficulty chart
-while cur_difficulty is not target_difficulty:
+while cur_difficulty != target_difficulty:
     # balloons indexes are only within notes
     # lines start from #START to #END both inclusive
     level_metadata, lines, notes, balloons = chartProcessor.preprocess(cur_difficulty_lines)

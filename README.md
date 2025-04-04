@@ -44,12 +44,15 @@ The environment has to be activated any time you want to make predictions.
 Run the command:
 - python3 taiko_predict.py 
 With arguments:
-- -input (or -i) path_to_tja_file_to_simplify
+- --target (or -t) target_difficulty
+  - Optional: Default is Easy
+- --input (or -i) path_to_tja_file_to_simplify
   - Mandatory
-- -output (or -o) path_to_output_folder
+- --output (or -o) path_to_output_folder
   - Optional: Default is prediction/out
 
 Example Usage (with sample song): `python3 taiko_predict.py -i "prediction/in/Kyokuken.tja"`  
+Another Example Usage: `python3 taiko_predict.py -t "Easy" -i "prediction/in/Kyokuken.tja" -o "prediction/out"`  
 Note: Paths may be relative from the root folder of TCS!
 
 ## 🎮 How to play
