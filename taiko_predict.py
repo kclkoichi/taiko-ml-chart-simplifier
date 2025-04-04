@@ -112,6 +112,10 @@ difficulty_to_model_map = {
 
 chartProcessor = ChartProcessor()
 
+with open(tokenizer_path, 'r') as f:
+    tokenizer_json = f.read()  # Read as string
+tokenizer = tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_json)
+
 to_write = []
 to_write.append(cur_difficulty_lines) # To also have original difficulty in the .tja output file
 
@@ -124,10 +128,6 @@ while cur_difficulty != target_difficulty:
 
     model_path = os.path.join(models_path, difficulty_to_model_map[cur_difficulty])
     model = tf.keras.models.load_model(model_path)
-
-    with open(tokenizer_path, 'r') as f:
-        tokenizer_json = f.read()  # Read as string
-    tokenizer = tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_json)
 
     new_sequence = tokenizer.texts_to_sequences(notes)
 
