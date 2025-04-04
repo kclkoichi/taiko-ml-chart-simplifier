@@ -65,8 +65,7 @@ Once your new .tja file is generated:
 - On the device, select the .zip file and share it to Taiko-san Daijiro 3
   - See screenshots below for help on iPad
 
-<img src="instruction_img/share1.jpg?raw=true" alt="Share" width="200"/>
-<img src="instruction_img/share2.jpg?raw=true" alt="Share" width="200"/>
+<img src="instruction_img/share1.jpg?raw=true" alt="Share" width="200"/> <img src="instruction_img/share2.jpg?raw=true" alt="Share" width="200"/>
 
 Then, the game will automatically process the song.  
 By default, your song will be in the "Uncategorized" folder!  
@@ -74,8 +73,8 @@ Enjoy playing!!!
 
 ## ⚙️ How to train or use your own models
 
-`python3 taiko_predict.py` calls tf.keras.models.load_model on .h5 files in models/.
-⚠️ It is your responsibility to ensure that the .h5 prediction model you load is not malicious!
+`python3 taiko_predict.py` calls tf.keras.models.load_model on .h5 files in models/.  
+⚠️ It is your responsibility to ensure that the .h5 prediction model you load is not malicious!  
 ✅ The original included ones are safe for use.
 
 2 main scripts to train the model:
@@ -95,7 +94,7 @@ Enjoy playing!!!
   - Finding all .tja files in songs/ recursively, if the filename appears in src/analysis/valid_charts.txt, then the .tja is copied to raw_data/
 
 ## Package versions:
-python: 3.11.5
-tensorflow: 2.12.0
-chardet: 5.2.0
+python: 3.11.5  
+tensorflow: 2.12.0  
+chardet: 5.2.0  
 (for more details look at taiko-ml.yaml)
